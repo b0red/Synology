@@ -1,0 +1,12 @@
+#!/opt/bin/bash
+
+DATE=$(date +%Y%m%d-%H%M%S)
+
+# Target file
+#TARTARGET="/volume1/my_scripts/backup-$DATE.tar.gz"
+zip -r $DATE-updateZip /volume1/my_scripts/*
+
+#mailar listan
+echo "Backup" | /opt/bin/nail -s "Backupfiler" -a /volume1/my_scripts/$DATE-updateZip.zip  mr.akita@gmail.com
+rm *.zip
+
