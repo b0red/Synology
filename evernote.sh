@@ -5,12 +5,13 @@
 # Constant values
 TAGMARK="#"
 NOTEBOOKMARK="@"
+source email_variables.sh
 
 # Default values
 def_attach=false
 def_inputfile=""
-def_address="akita09.fd3f2@m.evernote.com"
-def_addressother="Y0PJsEZEGe4ubHnYaE37EEuNRWfkNO@api.pushover.net"
+def_address=$EMAIL_G
+def_addressother=$EMAIL_P
 def_title="By email"
 def_tag=""
 def_notebook="_INBOX"
