@@ -2,9 +2,8 @@
 #
 # Script for speeding up the NAS
 
-clear; echo \n
+clear; echo; echo "Do you want to start the services? [halt or run]: "
 
-echo -n "Do you want to start the services? [halt or run]: "
 read hro
 case $hro in
 	[hH] | [hH][aA][lL][tT] )
@@ -23,7 +22,6 @@ case $hro in
 	chmod a-x /usr/syno/etc/rc.d/S??synomkthumbd.sh
 	# If you don't use Download Station (but e.g. SABnzbd instead):
 	chmod a-x /usr/syno/etc/rc.d/S??pgsql.sh
-	
 	;;
 
 
@@ -42,7 +40,6 @@ case $hro in
 	/usr/syno/etc/rc.d/S??synomkthumbd.sh start
 	# If you don't use Download Station (but e.g. SABnzbd instead):
 	/usr/syno/etc/rc.d/S??pgsql.sh start
-	
 	;;
 	
         *) echo "Invalid input"
