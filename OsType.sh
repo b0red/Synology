@@ -11,8 +11,8 @@ lowercase(){
 ####################################################################
 shootProfile(){
         OS=`lowercase \`uname\``
-        KERNEL='uname -r'
-        MACH='uname -m'
+        KERNEL=`uname -r`
+        MACH=`uname -m`
 
         if [ "${OS}" == "cygwin_nt-6.1" ]  ; then
                 OS=windows
