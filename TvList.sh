@@ -51,7 +51,7 @@ echo "$EMAILBODY" $'\n' "$MESS" | /opt/bin/nail -s "${NEW}st nya i $EMAILSUBJECT
 
 
 ## Mailto Evernote
-echo "${EMAILSUBJECT}" $'\n' | /opt/bin/nail -s "${NEW}st nya i ${EMAILSUBJECT} ${NOTEBOOK} ${TAGS}"\
+echo "${EMAILSUBJECT}" $'\n' "$MESS" | /opt/bin/nail -s "${NEW}st nya i ${EMAILSUBJECT} ${NOTEBOOK} ${TAGS}"\
  -a /tmp/v$DATE-weekly.txt ${EMAIL_E}
 
 ## Just for checking
