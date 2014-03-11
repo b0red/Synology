@@ -1,21 +1,21 @@
 #!/opt/bin/bash
-
-# Variables
-NODE=`uname -n`
-NAME=BackUP
-
-# Source variables
+#
+# Script för att backaupp /scripts
+#
+source variables.sh
 source email_variables.sh
 
+# Create Target file
+zip -r /tmp/$SHORTDATE-BackUpZip-$IP.zip /volume1/.backups /volume1/my_scripts/ -x *.git*
 
-DATE=$(date +%Y%m%d-%H%M%S)
+# Sending the file
+echo Creating folder if it doest exist: $STORAGEPATH$BACKUP"; droptobox mkdir $STORAGEPATH$BACKUP
+droptobox upload /tmp/$SHORTDATE-BackUpZip-$IP.zip $STORAGEPATH$BACKUP
 
-# Target file
-#TARTARGET="/volume1/my_scripts/backup-$DATE.tar.gz"
-zip -r /tmp/$DATE-$NAME /volume1/my_scripts /volume1/.backups
+# Mailar listan
+echo "Backup" | /opt/bin/nail -s "Backupfil @$NODE" -a /tmp/$SHORTDATE-BackUpZip-$IP.zip $EMAIL_G $EMAIL_P
 
-
-#mailar listan
-echo "Backup" | /opt/bin/nail -s "Backupfil @$NODE" -a /tmp/$DATE-$NAME.zip $EMAIL_G $EMAIL_P
-rm /tmp/$DATE-$NAME.zip
+# Cleanup
+echo Removing: $SHORTDATE-BackUpZip-$IP.zip
+rm /tmp/$SHORTDATE-BackUpZip-$IP.zip
 
