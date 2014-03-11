@@ -1,7 +1,0 @@
-#!/opt/bin/bash
-
-#delete old file
-#rm /tmp/filmer.txt
-
-find /volume2/Disk2 -type f \( -iname "*.avi" -o -iname "*.m*v" -o -iname "*.iso" -o -iname "*.mp*" \) | sort -do /tmp/filmer.txt
-
