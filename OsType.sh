@@ -75,7 +75,7 @@ then
  echo "REV: $REV"
  echo "DistroBasedOn: $DistroBasedOn"
  echo "KERNEL: $KERNEL"
- echo "MACH: $MACH"
+ echo "MACHINE: $MACH"
  echo "========"
 fi
 

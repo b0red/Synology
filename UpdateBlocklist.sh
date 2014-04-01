@@ -1,90 +1,139 @@
-#!/opt/bin/bash
-#
-# taken from http://forum.buffalo.nas-central.org/viewtopic.php?f=71&t=23581
+#!/bin/bash
+#======================================================================
+# Title: blocklistgen.sh
+# Description: Script for downloading and generating an IP blocklist
+# Author: Ragnarok (http://crunchbang.org/forums/profile.php?id=13069)
+# Date: 2013-04-13
+# Version: 0.1
+# Usage: $ bash blocklistgen.sh
+# Dependencies: bash, coreutils, gzip, wget
+# Updated by NotJohn to allow download of ip list in DAT format for uTorrent
+#======================================================================
 
-TO_ADDR=[Y0PJsEZEGe4ubHnYaE37EEuNRWfkNO@api.pushover.net]
+# Save path for the blocklist
+blocklist="/volume2/@appstore/transmission/blocklists/ipfilter.dat"
+uTorrentBlockList="/volume2/@appstore/transmission/blocklists/ipfilter.dat"
+# Directory for storing temporary lists
+# tmpfldr="/volume1/@appstore/uTorrent/utorrent-server-v3_0/scripts/tmp"
+tmpfldr="/volume2/@appstore/transmission/tmp"
 
-# First kill the transmission-daemon 
-PID="`pidof transmission-daemon`"
-if [ -n "$PID" ]; then
-        kill $PID
-fi
+# Beautify the blocklist after it is generated
+beautify=true
 
-echo -n "Waiting for the daemon to exit "
-sleep 2
+# Disabled. This doesn't work as expected for some reason
+#check_for_paths() {
+#  if [[ ! -d "$tmpfldr" ]] && [[ ! -r "$tmpfldr" ]] && [[ ! -w "$tmpfldr" ]]; then
+#    echo -e "Please make sure " "$tmpfldr" " exists and you have read/write access\nExiting"
+#    exit 1
+#  fi
+#}
 
-COUNT=1
-while [ -n "`pidof transmission-daemon`" ]; do
-        COUNT=$((COUNT + 1))
-        if [ $COUNT -gt 60 ]; then
-                echo -n "transmission-daemon doesn't respond, killing it with -9"
-                kill -9 `pidof transmission-daemon`
-                break
-        fi
-        sleep 2
-        echo -n "."
-done
+# http://wiki.bash-hackers.org/scripting/style
+check_for_depends() {
+  my_needed_commands="cat gunzip mv rm sed sort wget"
 
-echo " done"
-
-# Update the line below with the location of your blocklists directory
-# cd $HOME/.config/transmission-daemon/blocklists/
-cd /volume2/@appstore/transmission/blocklists
-
-# Create a temp file to store the message to email
-TMPFILE=`mktemp -t transmission.XXXXXXXXXX`
-
-# define the URL of where to obtain the blocklists and the names of the lists
-# URL="http://list.iblocklist.com/?list="bt_level1&fileformat=p2p&archiveformat=gz
-URL="http://list.iblocklist.com/?list="
-URL_NAME[1]="bt_level1"
-URL_NAME[2]="bt_level2"
-URL_NAME[3]="bt_level3"
-URL_NAME[4]="bt_spyware"
-URL_NAME[5]="bt_microsoft"
-URL_NAME[6]="ecqbsykllnadihkdirsh"
-
-# wget the files from the above URL
-EMAIL_MSG="The following blocklists have been updated; \n"
-for (( x=1; x<=${#URL_NAME[@]}; c++ ))
-do
-    WGET_OUTPUT=$(2>&1 wget --timestamping --progress=dot:mega "$URL${URL_NAME[x]}") 
-    if [ $? -ne 0 ]; then
-        EMAIL_MSG="$EMAIL_MSG \n // WARNING: ${URL_NAME[x]}.gz was NOT updated // \n $WGET_OUTPUT \n"
-    else
-        EMAIL_MSG="$EMAIL_MSG \n${URL_NAME[x]} - Success."
-        if [ -f ${URL_NAME[x]}.gz ]; then
-          rm -f ${URL_NAME[x]}.bin
-          rm -f ${URL_NAME[x]}
-          gunzip ${URL_NAME[x]}.gz
-        fi
+  missing_counter=0
+  for needed_command in $my_needed_commands; do
+    if ! hash "$needed_command" >/dev/null 2>&1; then
+      printf "Command not found in PATH: %s\n" "$needed_command" >&2
+      ((missing_counter++))
     fi
-    let x=x+1
-done
+  done
 
-# Write the $EMAIL_MSG string to a temp file and send email (using Nail which you must install seperatly)
-echo -e $EMAIL_MSG >$TMPFILE
-SUBJECT="Blocklist Update"
-NAIL=/opt/bin/nail
-$NAIL -v -s "$SUBJECT"  "$TO_ADDR" < $TMPFILE
-rm $TMPFILE
+  if ((missing_counter > 0)); then
+    printf "Minimum %d commands are missing in PATH, aborting\n" "$missing_counter" >&2
+    exit 1
+  fi
+}
 
-# Restart the daemon
-# transmission-daemon
- /usr/local/transmission/bin/transmission-daemon
+backup_blocklist() {
+  # Check for and backup blocklist
+  echo "Checking for blocklist..."
+  if [[ -f "$blocklist" ]]; then
+    echo "Backing up blocklist and overwriting old backup if exists..."
+    mv -f $blocklist ${blocklist}.old
+  fi
+}
 
-# Now wait for four minutes to allow the BIN files to be created
-# (Transmission scans the blocklists directory and automatically creates the files)
-# If you add lots of Blocklists, you might want to increase the delay to allow the files to be created
-sleep 5m
+downloads_lists() {
+  # Download blocklists
+  # This is where you add/remove blocklists
+  # Downloaded lists must follow the following naming format: bl-[zero or more characters].gz
+	# https://www.iblocklist.com/list.php?list=bt_level1  
+echo "Downloading lists..."
+  wget -q "http://list.iblocklist.com/?list=bcoepfyewziejvcqyhqo&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-iana-reserved.gz
+  wget -q "http://list.iblocklist.com/?list=bt_ads&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-ads.gz
+  wget -q "http://list.iblocklist.com/?list=bt_bogon&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-bogon.gz
+  wget -q "http://list.iblocklist.com/?list=bt_dshield&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-dshield.gz
+  wget -q "http://list.iblocklist.com/?list=bt_hijacked&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-hijacked.gz
+  wget -q "http://list.iblocklist.com/?list=bt_level1&fileformat=p2p&archiveformat=gz" -O $tmpfldr/bl-level1.dat
+  wget -q "http://list.iblocklist.com/?list=bt_level2&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-level2.gz
+  wget -q "http://list.iblocklist.com/?list=bt_level3&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-level3.gz
+  wget -q "http://list.iblocklist.com/?list=bt_microsoft&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-microsoft.gz
+  wget -q "http://list.iblocklist.com/?list=bt_spyware&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-spyware.gz
+  wget -q "http://list.iblocklist.com/?list=bt_templist&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-badpeers.gz
+  wget -q "http://list.iblocklist.com/?list=ijfqtofzixtwayqovmxn&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-primary-threats.gz
+  wget -q "http://list.iblocklist.com/?list=pwqnlynprfgtjbgqoizj&fileformat=dat&archiveformat=gz" -O $tmpfldr/bl-iana-multicast.gz
+  echo "Download complete"
+}
 
-# Transmission initially creates a zero byte .bin file while processing the blocklist
-# Check the .bin filesizes > 0, then delete the gz/text files that were downloaded.
+merge_lists() {
+  # Merge blocklists
+  echo "Merging lists..."
+  cat ${tmpfldr}/bl-*.gz > ${blocklist}.gz
+}
 
-#for (( x=1; x<=${#URL_NAME[@]}; c++ ))
-#do
-#    if [ $(stat -c%s "${URL_NAME[x]}.bin") <> 0 ]; then
-#      rm -f ${URL_NAME[x]}
-#      let x=x+1
-#    fi
-#done
+decompress_blocklist() {
+  # Decompress the gzip archive
+  if [[ -f "${blocklist}.gz" ]]; then
+    echo "Decompressing..."
+    gunzip ${blocklist}.gz
+    echo "Blocklist successfully generated"
+  else
+    echo -e "Unable to find ${blocklist}.gz\nExiting"
+    remove_temp
+    exit 1
+  fi
+}
+
+beautify_blocklist () {
+  # Cleanup the blocklist
+  # This will remove comments, empty lines and sort the list alphabetically
+  if $beautify; then
+    echo -e "Beautification started\nRemoving comments and blank lines..."
+    sed -i -e '/^\#/d' -e '/^$/d' $blocklist
+    echo "Sorting alphabetically..."
+    sort $blocklist > ${tmpfldr}/blocklist.p2p.tmp && mv -f ${tmpfldr}/blocklist.p2p.tmp $blocklist
+    echo "Beautification complete"
+  fi
+}
+
+remove_temp() {
+  # Remove temporary blocklists
+  echo "Removing temporary files..."
+  rm -f ${tmpfldr}/bl-*.gz
+}
+
+update_utorrent() {
+   #Replace uTorrent Block List
+   cp -f $blocklist $uTorrentBlockList
+
+   #restart uTorrent
+   echo -e "Restarting uTorrent"
+   sh /opt/etc/init.d/S99uTorrent restart
+   echo -e "Restart Complete"
+}
+
+check_for_depends
+#check_for_paths
+backup_blocklist
+downloads_lists
+merge_lists
+decompress_blocklist
+remove_temp
+beautify_blocklist
+update_utorrent
+
+echo "Done!"
+
+exit 0

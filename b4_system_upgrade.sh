@@ -20,6 +20,7 @@ case $bro in
 	echo " $BU_PATH/$BU_DIR created!"
 	cp /etc/crontab $BU_PATH/$BU_DIR/crontab 
 	cp /root/.profile $BU_PATH/$BU_DIR/.profile
+	cp /etc/ssh/sshrc $BU_PATH/$BU_DIR/sshrc
 	##cp /root/.ssh $BU_PATH/$BU_DIR/.ssh/
 	cp /root/.tmux.conf $BU_PATH/$BU_DIR/.tmux.conf
 	echo "Files copied!"
@@ -31,6 +32,7 @@ case $bro in
 	mv $BU_PATH/$BU_DIR/crontab /etc/crontab; chmod 755
 	mv $BU_PATH/$BU_DIR/.profile /root/.profile
 	mv $BU_PATH/$BU_DIR /root/.tmux.conf
+	mv $BU_PATH/$BU_DIR/sshrc /etc/ssh/
 	echo "Files restored!"
 	echo "Deleting folder: $BU_PATH/$BU_DIR/"
 	rm -rf $BU_PATH/$BU_DIR/; echo "Done!"
