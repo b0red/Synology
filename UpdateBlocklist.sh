@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/opt/bin/bash
 #======================================================================
 # Title: blocklistgen.sh
 # Description: Script for downloading and generating an IP blocklist
@@ -16,6 +16,15 @@ uTorrentBlockList="/volume2/@appstore/transmission/blocklists/ipfilter.dat"
 # Directory for storing temporary lists
 # tmpfldr="/volume1/@appstore/uTorrent/utorrent-server-v3_0/scripts/tmp"
 tmpfldr="/volume2/@appstore/transmission/tmp"
+
+# Path to TransmissionMail.sh
+source /volume1/my_scripts/email_variables.sh
+#MAILPATH=/volume1/my_scripts/TransmissionMail.sh
+SUBJECT="Transmission!"
+HEADER="Transmission..."
+INFO_1="Stopping the Transmission Daemon!"
+INFO_2="New blocklists downloaded and merged!"
+INFO_3="Transmission Daemon started!"
 
 # Beautify the blocklist after it is generated
 beautify=true
@@ -54,6 +63,10 @@ backup_blocklist() {
     mv -f $blocklist ${blocklist}.old
   fi
 }
+
+# Stopping Transmission and echo to nail
+sh /var/packages/transmission/scripts/start-stop-status stop
+echo $INFO_1 | /opt/bin/nail -s "$INFO_1" $EMAIL_P
 
 downloads_lists() {
   # Download blocklists
@@ -108,19 +121,23 @@ beautify_blocklist () {
   fi
 }
 
+# Info on blocklists to nail
+echo $INFO_2 | /opt/bin/nail -s "$INFO_2" $EMAIL_P
+
 remove_temp() {
   # Remove temporary blocklists
   echo "Removing temporary files..."
   rm -f ${tmpfldr}/bl-*.gz
 }
 
+
 update_utorrent() {
    #Replace uTorrent Block List
    cp -f $blocklist $uTorrentBlockList
 
    #restart uTorrent
-   echo -e "Restarting uTorrent"
-   sh /opt/etc/init.d/S99uTorrent restart
+   echo -e "Restarting Transmission"
+   sh /var/packages/transmission/scripts/start-stop-status restart
    echo -e "Restart Complete"
 }
 
@@ -133,6 +150,11 @@ decompress_blocklist
 remove_temp
 beautify_blocklist
 update_utorrent
+
+# Stopping Transmission and echo to nail
+sh /var/packages/transmission/scripts/start-stop-status restart
+echo $INFO_3 | /opt/bin/nail -s "$INFO_3" $EMAIL_P
+
 
 echo "Done!"
 
