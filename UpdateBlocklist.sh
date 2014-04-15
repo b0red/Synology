@@ -122,7 +122,7 @@ beautify_blocklist () {
 }
 
 # Info on blocklists to nail
-echo $INFO_2 | /opt/bin/nail -s "$INFO_2" $EMAIL_P
+# echo $INFO_2 | /opt/bin/nail -s "$INFO_2" $EMAIL_P
 
 remove_temp() {
   # Remove temporary blocklists
@@ -151,7 +151,7 @@ remove_temp
 beautify_blocklist
 update_utorrent
 
-# Stopping Transmission and echo to nail
+# Restarting TTransmission and echo to nail
 sh /var/packages/transmission/scripts/start-stop-status restart
 echo $INFO_3 | /opt/bin/nail -s "$INFO_3" $EMAIL_P
 

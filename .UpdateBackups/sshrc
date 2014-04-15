@@ -1,6 +1,0 @@
-ip=`echo $SSH_CONNECTION | cut -d " " -f 1`
-node=`uname -n`
-upt=`uptime`
-NOW=$(date +"%H:%M")
-logger -t ssh-wrapper $USER login from $ip
-echo -e "User $USER just logged in from $ip @$node\n$NOW UP:$upt" | /opt/bin/nail -s "SSH Login" Y0PJsEZEGe4ubHnYaE37EEuNRWfkNO@api.pushover.net
