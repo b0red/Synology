@@ -1,6 +1,0 @@
-#!/bin/sh
-mount -o bind /volume1/@optware /opt 
-# Optware setup
-[ -x /etc/rc.optware ] && /etc/rc.optware start
-
-exit 0
