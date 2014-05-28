@@ -1,0 +1,13 @@
+#mins   hour    mday    month   wday    who     command
+#(0-59)(0-23)   (1-31)  (1-12/Jan-Dec) (0-6/Sun-Sat)
+0	1	*/7	*	*	root	/var/packages/ipkgui/target/include/cron.pl 2>/dev/null
+7	0	*	*	0,1,2,3,5	root	/usr/syno/bin/synopkg chkupgradepkg
+0	0	*	*	*	root	/volume2/@appstore/transmission/bin/transmission-remote --blocklist-update #update blocklist
+0	0	*	*	*	root	/tmp/synoschedtask --run id=2
+0	23	*	*	0	root	/tmp/synoschedtask --run id=1
+0	8	*	*	mon	root	/volume1/my_scripts/TvList.sh #Uppdaterade tv-serier	
+0	12	*	*	mon	root	/volume1/my_scripts/filelist.sh	#listar filmer t evernote
+0	12	*	*	sun	root	/volume1/my_scripts/MyScriptsBU.sh #Backar filer t mail
+0	0	*	*	0	root	/volume1/my_scripts/TransmissionMail.sh #Skickar fillistan t evernote
+0	0	1	*	*	root	/usr/syno/bin/syno_disk_health_record
+59	13	*	*	3,6	root	/usr/syno/sbin/synoupgrade --fetch-all

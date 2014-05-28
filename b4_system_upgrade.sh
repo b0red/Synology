@@ -1,48 +1,78 @@
 #!/opt/bin/bash
-# Creates copys and symlinks of files that changes after a system update
+# Creates copys and symlinks of files that usually changes after a system update
 #
 # Created 2014-03
+# Updated 2014-05
 
 clear; echo; echo "Do you want to [B]ackup or [R]estore the files?"
 
+# Include variables
+source variables.sh
+# Inclide email_variables
+source email_variables.sh
+
 # Settings
 BU_PATH="/volume1/my_scripts"
-BU_DIR=".UpdateBackups"
-
+BU_DIR="tmp"
+NEWPATH=$BU_PATH/$BU_DIR
+FILE=B4U-Backup
+DBPATH=/Machines/Synology/Backups
 
 read bro
-case $bro in 
+case $bro in
 	[bB] )
 	# Backup
+	if [ ! -d "$NEWPATH" ]; then
+		# Control will enter here if $DIRECTORY doesn't exist.
+		echo "Creating backup fOlder..."
+		mkdir $NEWPATH; echo "$NEWPATH created!"
+	  fi
 	echo "Backing up files..."
-	echo "Creating backup filder..."
-	mkdir $BU_PATH/$BU_DIR
-	echo " $BU_PATH/$BU_DIR created!"
-	cp /etc/crontab $BU_PATH/$BU_DIR/crontab 
-	cp /root/.profile $BU_PATH/$BU_DIR/.profile
-	cp /opt/etc/nail.rc $BU_PATH/$BU_DIR/nail.rc
-	cp /etc/ssh/sshrc $BU_PATH/$BU_DIR/sshrc
-	##cp /root/.ssh $BU_PATH/$BU_DIR/.ssh/
-	cp /root/.tmux.conf $BU_PATH/$BU_DIR/.tmux.conf
-	echo "Files copied!"
+		cp /etc/crontab $NEWPATH/crontab								# crontab
+		cp /root/.profile $NEWPATH/.profile								# .profile in root
+		cp /etc/rc.local $NEWPATH/rc.local								# rc.local
+		cp /opt/etc/nail.rc $NEWPATH/nail.rc							# nail config
+		cp /etc/ssh/sshrc  $NEWPATH/sshrc								# sshrc
+		##cp /root/.ssh $BU_PATH/$BU_DIR/.ssh/
+		cp /root/.tmux.conf $NEWPATH/.tmux.conf							# tmux.conf
+		cp /opt/etc/nanorc $NEWPATH/nanorc								# nanorc
+		cp /usr/local/sickbeard/var/config.ini $NEWPATH/SB_Config.ini	# SB config
+		cp /usr/local/sabnzbd/var/config.ini $NEWPATH/SAB_Config.ini	# SABnzbd
+		echo  $NEWPATH/$FILE-$DATE.zip
+		if zip -r $NEWPATH/$FILE-$DATE.zip $NEWPATH/ -x bt_level* *.zip ;then
+				droptobox upload $NEWPATH/$FILE-$DATE.zip $DBPATH
+				echo "Backup" | /opt/bin/nail -s "$FILE-$DATE.zip till dropbox @$NODE" -a  $NEWPATH/$FILE-$DATE.zip $EMAIL_G $EMAIL_P
+			else
+				echo "Nothing done!"
+		fi
+	echo "Files copied and sent!"
+	echo "Deleting zipfile: $FILE-$DATE.zip"
+	rm -rf  $NEWPATH/$FILE-$DATE.zip
 	;;
 
 	[rR] )
-	# Restore
+	# Restore files to original places
 	echo "Restoring files..."
-	mv $BU_PATH/$BU_DIR/crontab /etc/crontab; chmod 755 /etc/crontab
-	mv $BU_PATH/$BU_DIR/.profile /root/.profile
-	mv $BU_PATH/$BU_DIR /root/.tmux.conf
-	mv $BU_PATH/$BU_DIR/sshrc /etc/ssh/
-	mv $BU_PATH/$BU_DIR/nail.rc /opt/etc/nail.rc
+		mv $NEWPATH/crontab /etc/crontab; chmod 755 /etc/crontab
+		mv $NEWPATH/.profile /root/.profile
+		mv $NEWPATH/rc.local /etc/rc.local
+		mv $NEWPATH/nail.rc /opt/etc/nail.rc
+		mv $NEWPATH/sshrc /etc/ssh/sshrc
+		mv $NEWPATH/root/.tmux.conf /root/.tmux.conf
+		mv $NEWPATH/nanorc /opt/etc/nanorc
+		mv $NEWPATH/SB_Config.ini /usr/local/sickbeard/var/config.ini
+		mv $NEWPATH/SAB_Config.ini /usr/local/sabnzbd/var/config.ini
 	echo "Files restored!"
-	echo "Deleting folder: $BU_PATH/$BU_DIR/"
-	rm -rf $BU_PATH/$BU_DIR/; echo "Done!"
+	read -p "Do you want do delete backups after restore? " -n 1 -r
+	echo    # (optional) move to a new line
+	if [[ $REPLY =~ ^[Yy]$ ]];then
+		# do dangerous stuff
+    	rm -rf $NEWPATH/* ; echo "Done!"
+    fi
 	;;
 
-        *) 
+        *)
 	echo "Invalid input"
-        echo "Usage: $0 [(B)ackup|(R)estore]"
-    ;;
+    echo "Usage: $0 [(B)ackup|(R)estore]"
+    	;;
 esac
-
