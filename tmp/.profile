@@ -31,3 +31,5 @@ alias ll="ls -la"
 
 alias ls='ls --color'
 export PS1='\w$ '
+alias ls='ls --color'
+export PS1='\w$ '

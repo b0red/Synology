@@ -3,6 +3,7 @@
 
 # Get stuff
 source email_variables.sh
+source variables.sh
 
 # Debug
 #set -x
@@ -18,12 +19,12 @@ NOW=$(date +"#%G #%b #v%V")
 TAGS="$NOW #TV #Tvserier"
 
 # Delete $NEWFOLDER/
-rm -rf $NEWFOLDER/
+rm -rf $NEWFOLDER/*
 
 # Check if weekly exists and is older than a week, then delete it
-find /tmp/*weekly* -type f -mtime +7 -exec rm -rf *weekly* {} \; 
+find /tmp/*weekly* -type f -mtime +7 -exec rm -rf *weekly* {} \;
 #echo its older
- 
+
 # Check if folder exists
 if [ ! -d $NEWFOLDER ]; then
   mkdir -p $NEWFOLDER
@@ -65,8 +66,6 @@ echo "${EMAILSUBJECT}" $'\n' "$MESS" | /opt/bin/nail -s "${NEW}st nya i ${EMAILS
 
 # Mail to Pushover
 echo "$EMAILBODY" $'\n' "$MESS" | /opt/bin/nail -s "${NEW}st nya i $EMAILSUBJECT - V.${DATE}" ${EMAIL_P}
-
-
 
 ## Just for checking
 echo "${EMAILSUBJECT} "${MESS}" ${NEW} nya i ${EMAILSUBJECT} ${NOTEBOOK} ${TAGS} ${EMAILTO} ${EMAILSECOND}"

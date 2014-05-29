@@ -38,10 +38,13 @@ case $bro in
 		cp /opt/etc/nanorc $NEWPATH/nanorc								# nanorc
 		cp /usr/local/sickbeard/var/config.ini $NEWPATH/SB_Config.ini	# SB config
 		cp /usr/local/sabnzbd/var/config.ini $NEWPATH/SAB_Config.ini	# SABnzbd
+		cp /volume2/@appstore/transmission/var/settings.json $NEWPATH/settins.json #Transmission
+		cp /volume1/@appstore/sabnzbd/app/config,SABnzbd_Config $NEWPATH/SABnzbd_config
+		cp /volume1/@appstore/couchpotatoserver/var/settings.conf $NEWPATH/CP_settings.conf
 		echo  $NEWPATH/$FILE-$DATE.zip
 		if zip -r $NEWPATH/$FILE-$DATE.zip $NEWPATH/ -x bt_level* *.zip ;then
 				droptobox upload $NEWPATH/$FILE-$DATE.zip $DBPATH
-				echo "Backup" | /opt/bin/nail -s "$FILE-$DATE.zip till dropbox @$NODE" -a  $NEWPATH/$FILE-$DATE.zip $EMAIL_G $EMAIL_P
+				echo "Backup" | /opt/bin/nail -s "$FILE-$DATE.zip till dropbox @$NODE" -a  $NEWPATH/$FILE-$DATE.zip $EMAIL_P
 			else
 				echo "Nothing done!"
 		fi
@@ -62,6 +65,9 @@ case $bro in
 		mv $NEWPATH/nanorc /opt/etc/nanorc
 		mv $NEWPATH/SB_Config.ini /usr/local/sickbeard/var/config.ini
 		mv $NEWPATH/SAB_Config.ini /usr/local/sabnzbd/var/config.ini
+		mv $NEWPATH/settins.json /volume2/@appstore/transmission/var/settings.json
+		mv $NEWPATH/SABnzbd_config /volume1/@appstore/sabnzbd/app/config,SABnzbd_Config
+		mv $NEWPATH/CP_settings.conf /volume1/@appstore/couchpotatoserver/var/settings.conf
 	echo "Files restored!"
 	read -p "Do you want do delete backups after restore? " -n 1 -r
 	echo    # (optional) move to a new line
