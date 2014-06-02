@@ -1,3 +1,5 @@
 dyndns.sh
 email_variables.sh
 tmp/*
+statuss
+httpd.conf
