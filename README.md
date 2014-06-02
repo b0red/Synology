@@ -17,3 +17,29 @@
 * TransmissionMail				# sends mail from transmission
 * TvList						# tvlisting
 
+b4_system_upgrade.sh
+checkip.sh
+CurrentTvList.sh
+DirClean.sh
+dyndns.sh
+email_variables.sh
+evernote.sh
+FileDone_Transmission.sh
+filelist.sh
+login.default
+login.sh
+MyScriptsBU.sh
+NewTvList.sh
+new_update_blocklist.sh
+OsType.sh
+RenameTV.sh
+Services.sh
+d_LogCleaner.sh
+SpeedUp.sh
+TransmissionMail.sh
+TvList.sh
+UnRar.sh
+Update_blocklist.sh
+UpdateBlocklist.sh
+variables.sh
+   
