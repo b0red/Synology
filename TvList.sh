@@ -1,3 +1,4 @@
+
 #!/opt/bin/bash
 #
 
@@ -56,19 +57,17 @@ then
 	# Send mail about updates
 	# Mailto Pushover
 	echo mail: $MESS to $EMAIL_P
-	echo "$EMAILBODY" $'\n' "$MESS" | /opt/bin/nail -s "${NEW}st nya i $EMAILSUBJECT - V.${DATE}" ${EMAIL_P}
+	echo "$EMAILBODY" $'\n' "$MESS" | /opt/bin/nail -s "${NEW} st nya i $EMAILSUBJECT - V.${DATE}" ${EMAIL_P}
 	exit
 fi
 
 ## Mailto Evernote
-echo "${EMAILSUBJECT}" $'\n' "$MESS" | /opt/bin/nail -s "${NEW}st nya i ${EMAILSUBJECT} ${NOTEBOOK} ${TAGS}"\
+echo "${EMAILSUBJECT}" $'\n' "$MESS" | /opt/bin/nail -s "${NEW} st nya i ${EMAILSUBJECT} ${NOTEBOOK} ${TAGS}"\
  -a /tmp/v$DATE-weekly.txt ${EMAIL_E}
 
 # Mail to Pushover
-echo "$EMAILBODY" $'\n' "$MESS" | /opt/bin/nail -s "${NEW}st nya i $EMAILSUBJECT - V.${DATE}" ${EMAIL_P}
+echo "$EMAILBODY" $'\n' "$MESS" | /opt/bin/nail -s "${NEW} st nya i $EMAILSUBJECT - V.${DATE}" ${EMAIL_P}
 
 ## Just for checking
 echo "${EMAILSUBJECT} "${MESS}" ${NEW} nya i ${EMAILSUBJECT} ${NOTEBOOK} ${TAGS} ${EMAILTO} ${EMAILSECOND}"
 #echo /tmp/v$DATE-weekly.txt
-
-#echo $MESSAGE
