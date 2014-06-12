@@ -3,3 +3,5 @@ email_variables.sh
 tmp/*
 statuss
 httpd.conf
+BU/*
+
