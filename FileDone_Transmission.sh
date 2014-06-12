@@ -2,6 +2,6 @@
 # Source variables
 source email_variables.sh
 
-echo "Fil nedladdad!" | /opt/bin/nail -s "Transmission" $EMAIL_P
+echo "Fil $TR_TORRENT_NAME nedladdad!" | /opt/bin/nail -s "Transmission meddelar: $TR_TORRENT_NAME nedladdad och klar!" $EMAIL_P
 #rm /tmp/filmer.txt
 

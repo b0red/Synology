@@ -2,18 +2,25 @@
 #
 # File for mass unpacking of rar files in subfolders
 # it unpacks, then deletes the residue and subfolder
+# It checks if the rar'ed files are in subdirs or not
+#
 # Modified by Patrick Osterlund 20140602
 # original file http://bit.ly/1mIF1Lx
 #
 # Requires: unrar, nailx
-
+clear
 
 # Variables
 source /volume1/my_scripts/email_variables.sh
 source /volume1/my_scripts/variables.sh
+
+# Sets current directory
 cwd=`pwd`
 
-#to check if its the right dir
+# Check for subdirs
+subdircount=`find $cwd -maxdepth 1 -type d | wc -l`
+
+# Check if we're in the right dir
 read -p "Are you sure this is the right dir: $cwd? " -n 1 -r
 echo    # (optional) move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
@@ -33,15 +40,23 @@ then
         	fi
 		fi
 
-	cd "$d"
-	echo "Unrar $f"
+		cd "$d"
+		echo "Unrar $f"
 
-	# Unpack the files
-	unrar x -o+ "$f";count=count+1
-	mv *.avi "$cwd"; rm -rf *.rar *.nfo *.sfv *.r* Sample
-	cd "$cwd"
-	# Remove empty folders
-	find . -type d -empty -exec rmdir {} \;
+		# Unpack the files
+		unrar x -o+ "$f";count=count+1
+		#mv *.avi *.mkv "$cwd";
+		type=`find . -regex ".*\.\(mkv\|avi\)$"`;echo $type;mv $type "$cwd"
+		rm -rf *.rar *.nfo *.sfv *.r* Sample
+		cd "$cwd"
+		# Remove empty sub folders if they exist
+		if [ $subdircount -eq 2 ];then
+				find $cwd -type d -empty -exec rmdir {} \; echo "tar bort"
+			else
+				echo "No dirs found, nothing to remove!"
+		fi
 	done
+	# All done, sending message
 	echo "$count files extracted!" | /opt/bin/nail -s "$count files extracted in folder: $cwd!" $EMAIL_P
 fi
+
