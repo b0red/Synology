@@ -21,9 +21,7 @@ Common='/Common'
 
 # No-ip.com login
 # No-IP uses emails as passwords, so make sure that you encode the @ as %40
-USERNAME=mrakita
-PASSWORD=2g00d4upsr%26N
-HOST=osterlund.hopto.org
+
 
 #STORAGEPATH=${DB_DEST}/${OS}/${OPS}_${RELEASE}
 STORAGEPATH=${DB_DEST}/${OS}/${MACHINE}
